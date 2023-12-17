@@ -1,17 +1,19 @@
 
-//  Set up URL for data import
+//  Set up URL for data import as a constant
 const url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json";
 
 const dataPromise = d3.json(url);
     console.log("Data Promise: ", dataPromise);
 
-// // Fetch the JSON data and console log it
+// Fetch the JSON data and console log it
 d3.json(url).then(function(data){
     console.log(data);
 });
-// Set up variables and get data from JSON for charts 
+// Set up variables and pull data from JSON for plotting
 var samples;
 var meta_data;
+
+// Use D3 to select data and populate menu
 d3.json(url).then(function (data) {
     let selector = d3.select("#selDataset");
     meta_data = data.metadata;
@@ -25,41 +27,41 @@ d3.json(url).then(function (data) {
 });
 
 function optionChanged(value) {
-    const selectedId = samples.find((item) => item.id === value);
-    const demographicInfo = meta_data.find((item) => item.id == value);
+    const idSelection = samples.find((item) => item.id === value);
+    const demoInfo = meta_data.find((item) => item.id == value);
 
-    // Insterting Demographic Data
-    metaData(demographicInfo);
+    // Insert Demographic Data
+    metaData(demoInfo);
 
     // Bar Chart
-    hbarChart(selectedId);
+    hbarChart(idSelection);
 
     // Bubble Chart
-    bubbleChart(selectedId);
+    bubbleChart(idSelection);
 
 }
 
-function metaData(demographicInfo) {
+function metaData(demoInfo) {
     let demoSelect = d3.select("#sample-metadata");
 
     demoSelect.html(
-        `id: ${demographicInfo.id} <br> 
-      ethnicity: ${demographicInfo.ethnicity} <br>
-    gender: ${demographicInfo.gender} <br>
-    age: ${demographicInfo.age} <br>
-    location: ${demographicInfo.location} <br>
-    bbtype: ${demographicInfo.bbtype} <br>
-    wfreq: ${demographicInfo.wfreq}`
+        `id: ${demoInfo.id} <br> 
+      ethnicity: ${demoInfo.ethnicity} <br>
+    gender: ${demoInfo.gender} <br>
+    age: ${demoInfo.age} <br>
+    location: ${demoInfo.location} <br>
+    bbtype: ${demoInfo.bbtype} <br>
+    wfreq: ${demoInfo.wfreq}`
     );
 }
-
-function hbarChart(selectedId) {
-    let x_axis = selectedId.sample_values.slice(0, 10).reverse();
-    let y_axis = selectedId.otu_ids
+// Format Charts for Display
+function hbarChart(idSelection) {
+    let x_axis = idSelection.sample_values.slice(0, 10).reverse();
+    let y_axis = idSelection.otu_ids
         .slice(0, 10)
         .reverse()
         .map((item) => `OTU ${item}`);
-    let text = selectedId.otu_labels.slice(0, 10).reverse();
+    let text = idSelection.otu_labels.slice(0, 10).reverse();
 
     barChart = {
         x: x_axis,
@@ -85,12 +87,12 @@ function hbarChart(selectedId) {
     Plotly.newPlot("bar", chart, layout);
 }
 
-function bubbleChart(selectedId) {
-    let x_axis = selectedId.otu_ids;
-    let y_axis = selectedId.sample_values;
-    let marker_size = selectedId.sample_values;
-    let color = selectedId.otu_ids;
-    let text = selectedId.otu_labels;
+function bubbleChart(idSelection) {
+    let x_axis = idSelection.otu_ids;
+    let y_axis = idSelection.sample_values;
+    let marker_size = idSelection.sample_values;
+    let color = idSelection.otu_ids;
+    let text = idSelection.otu_labels;
 
     bubble = {
         x: x_axis,
@@ -99,7 +101,7 @@ function bubbleChart(selectedId) {
         mode: "markers",
         marker: {
             color: color,
-            colorscale: "Pastel",
+            colorscale: "Bluered",
             size: marker_size,
         },
         type: "scatter",
@@ -108,7 +110,7 @@ function bubbleChart(selectedId) {
 
     let layout = {
         xaxis: {
-            title: { text: "OTU ID" },
+            title: { text: "OTU ID'S" },
         },
     };
     Plotly.newPlot("bubble", chart, layout);
